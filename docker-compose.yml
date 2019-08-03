@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  elasticsearch:
+    container_name: elasticsearch
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - ~/docker/elasticsearch/data/elasticsearch1:/usr/share/elasticsearch/data:rw
+    restart: always
