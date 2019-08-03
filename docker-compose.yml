@@ -12,5 +12,5 @@ services:
       - "9200:9200"
       - "9300:9300"
     volumes:
-      - ~/docker/elasticsearch/data/elasticsearch1:/usr/share/elasticsearch/data:rw
+      - ./data/elasticsearch1:/usr/share/elasticsearch/data:rw
     restart: always
