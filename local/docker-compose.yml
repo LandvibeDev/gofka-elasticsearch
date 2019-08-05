@@ -1,0 +1,86 @@
+version: '2'
+
+services:
+  master_es:
+    container_name: master_es
+    build:
+      context: ./master_node
+      dockerfile: ./Dockerfile
+    environment:
+      - "LS_JAVA_OPTS= -Xmx512m -Xms512m"
+      - "discovery.zen.ping.unicast.hosts=master_es,data_es"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9301:9300"
+    networks:
+      - esnet
+    volumes:
+      - ./data/master_es:/usr/share/elasticsearch/data:rw
+      - ./log/master_es:/usr/share/elasticsearch/log:rw
+    restart: always
+
+  data_es:
+    container_name: data_es
+    build:
+      context: ./data_node
+      dockerfile: ./Dockerfile
+    environment:
+      - "LS_JAVA_OPTS= -Xmx1024m -Xms1024m"
+      - "discovery.zen.ping.unicast.hosts=master_es,data_es"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9302:9300"
+    networks:
+      - esnet
+    volumes:
+      - ./data/data_es:/usr/share/elasticsearch/data:rw
+      - ./log/data_es:/usr/share/elasticsearch/log:rw
+    restart: always
+    depends_on:
+      - master_es
+
+  coordinator_es:
+    container_name: coordinator_es
+    build:
+      context: ./coordinator_node
+      dockerfile: ./Dockerfile
+    environment:
+      - "LS_JAVA_OPTS= -Xmx512m -Xms512m"
+      - "discovery.zen.ping.unicast.hosts=master_es,data_es"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+      - "9303:9300"
+    networks:
+      - esnet
+    volumes:
+      - ./data/coordinator_es:/usr/share/elasticsearch/data:rw
+      - ./log/coordinator_es:/usr/share/elasticsearch/log:rw
+    restart: always
+    depends_on:
+      - master_es
+      - data_es
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:6.8.2
+    environment:
+      - "ELASTICSEARCH_URL=http://coordinator_es:9200"
+      - "SERVER_HOST=0.0.0.0"
+    ports:
+      - 5601:5601
+    networks:
+      - esnet
+    depends_on:
+      - coordinator_es
+networks:
+  esnet:    
+
