@@ -8,9 +8,14 @@ services:
       dockerfile: ./Dockerfile
     environment:
       LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     ports:
       - "9200:9200"
       - "9300:9300"
     volumes:
       - ./data/elasticsearch1:/usr/share/elasticsearch/data:rw
+      - ./log/elasticsearch1:/usr/share/elasticsearch/log:rw
     restart: always

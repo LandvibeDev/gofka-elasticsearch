@@ -1,1 +1,8 @@
-./data
+master_node/data/
+master_node/log/
+data_node/data/
+data_node/log/
+coordinator_node/data/
+coordinator_node/log/
+local/data/
+local/log/
